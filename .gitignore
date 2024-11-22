@@ -5,9 +5,6 @@ __pycache__/
 # Ignore virtual environment directory
 venv/
 
-# Ignore pre-commit configuration file
-.pre-commit-config.yaml
-
 # Ignore logs or temporary files
 *.log
 *.tmp
