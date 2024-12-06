@@ -28,7 +28,8 @@
    ./scripts/setup.sh
    ```
 
-#### 4. Run the server:
+#### 4. Run the database and then start the server:
    ```bash
+   ./scripts/start_db.sh
    uvicorn app.main:app
    ```

@@ -12,7 +12,7 @@ then
     exit 1
 fi
 
-# Run nix-shell to run devenv.nix(same as nix develop) to set up the environment (seting up the dependencies, versions, pre-hook-commits and etc.
+# Run nix-shell to run devenv.nix (same as nix develop) to set up the environment (setting up the dependencies, versions, pre-hook-commits and etc.
 echo "Running nix develop."
 nix-shell "$PROJECT_DIR/devenv.nix" || { echo "Failed to enter nix-shell."; exit 1; }
 
