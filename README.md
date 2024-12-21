@@ -31,5 +31,5 @@
 #### 4. Run the database and then start the server:
    ```bash
    ./scripts/start_db.sh
-   uvicorn app.main:app
+   poetry run uvicorn main:app --reload
    ```

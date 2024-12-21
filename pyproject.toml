@@ -2,7 +2,7 @@
 name = "biosignal-processing"
 version = "0.1.0"
 description = "A project on analyzing a biosignal"
-authors = [""]
+authors = ["Yashar Najafi"]
 
 [tool.poetry.dependencies]
 python = "^3.11"

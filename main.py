@@ -1,4 +1,5 @@
 import os
+import uvicorn
 from fastapi import FastAPI
 from sqlalchemy import Column, Integer, Float, DateTime
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -51,3 +52,7 @@ async def startup_event():
     command.upgrade(
         alembic_cfg, "head"
     )  # This will apply all migrations to the latest state upon running the app
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
