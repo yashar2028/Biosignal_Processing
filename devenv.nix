@@ -8,10 +8,12 @@ in pkgs.mkShell {
     pkgs.python311Packages.pip
     pkgs.pre-commit     # To enable pre-commit hooks (see below)
     pkgs.poetry         # Poetry for dependency management
+    pkgs.stdenv.cc.cc.lib   # Include libstdc++
   ];
 
 # Add environment variables # Enable pre-commit hooks with the Devenv pre-commit module (imported above)
   shellHook = ''
+    export LD_LIBRARY_PATH=/nix/store/40yjzm7r5ki59kkk9423dnwbm86x7pyd-gcc-13.2.0-lib/lib:$LD_LIBRARY_PATH
     echo "Welcome to the Biosignal Project Dev Environment!"
     echo "Python version: $(python3 --version)"
     echo "Run 'uvicorn app.main:app --reload' to start the server."

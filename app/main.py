@@ -9,6 +9,8 @@ from alembic import command
 from alembic.config import Config
 from dotenv import load_dotenv
 
+from app.routes.health_check import router as health_check_router
+
 
 load_dotenv()  # Loading the environment variables from .env
 
@@ -40,18 +42,46 @@ async def get_db():  # Dependency to get the async database session
         yield db
 
 
-app = FastAPI()
+async def init_db():
+    """
+    Inittalize database (create tables)
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
+
+async def close_db():
+    await engine.dispose()
+
+
+app = FastAPI()
 ALEMBIC_CONFIG = "alembic.ini"
 
 
 @app.on_event("startup")
-async def startup_event():
-    """Run migrations on application startup."""
+async def startup_event_on_database():
+    """
+    Initialize the database and run migrations on application startup.
+    """
+
+    await init_db()
+
     alembic_cfg = Config(ALEMBIC_CONFIG)
     command.upgrade(
         alembic_cfg, "head"
     )  # This will apply all migrations to the latest state upon running the app
+
+
+@app.on_event("shutdown")
+async def shutdown_event_on_database():
+    """
+    In order to clean up database connections when the app shuts down.
+    """
+    await close_db()
+
+
+# All the routes at routes directory are registered here with their specified router.
+app.include_router(health_check_router)
 
 
 if __name__ == "__main__":
