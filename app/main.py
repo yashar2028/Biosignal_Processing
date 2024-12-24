@@ -1,7 +1,7 @@
 import os
 import uvicorn
 from fastapi import FastAPI
-from sqlalchemy import Column, Integer, Float, DateTime
+from sqlalchemy import Column, Integer, Float, String, DateTime
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -10,7 +10,8 @@ from alembic.config import Config
 from dotenv import load_dotenv
 
 from app.routes.health_check import router as health_check_router
-
+from app.routes.register import router as register_router
+from app.routes.display import router as display_router
 
 load_dotenv()  # Loading the environment variables from .env
 
@@ -22,12 +23,23 @@ Base = (
 )  # All the models (classes) that are going to be mapped to database tables have to inherit this.
 
 
-class SignalAmplitude(Base):
+class SignalAmplitude(Base):  # Table for stroring signal values.
     __tablename__ = "signal_amplitudes"
 
     id = Column(Integer, primary_key=True)
     amplitude = Column(Float)
     timestamp = Column(DateTime(timezone=True))
+
+
+class User(Base):  # User model for SQLAlchemy (table)
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    first_name = Column(String, unique=True, nullable=False)
+    last_name = Column(String, unique=True, nullable=False)
+    role = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
 
 
 # Setup SQLAlchemy Async Engine and Session. This session is then used below in get_db function and it can be used to interact with database (populate, etc.)
@@ -82,7 +94,8 @@ async def shutdown_event_on_database():
 
 # All the routes at routes directory are registered here with their specified router.
 app.include_router(health_check_router)
-
+app.include_router(register_router)
+app.include_router(display_router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

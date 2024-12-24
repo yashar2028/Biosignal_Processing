@@ -1,8 +1,3 @@
-from main import (
-    Base,
-)  # Import the Base from your main.py (where your SQLAlchemy models are defined)
-
-
 import sys
 import os
 from sqlalchemy import create_engine
@@ -11,6 +6,13 @@ from dotenv import load_dotenv
 from logging.config import fileConfig
 
 from alembic import context
+
+
+def get_base():
+    from app.main import Base
+
+    return Base  # Import the Base from your main.py (where your SQLAlchemy models are defined)
+
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -31,7 +33,7 @@ if config.config_file_name is not None:
 # add your model's MetaData object here (any model with Base model should bring in here)
 # for 'autogenerate' support
 
-target_metadata = Base.metadata
+target_metadata = get_base().metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
