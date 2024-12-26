@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 from app.routes.health_check import router as health_check_router
 from app.routes.register import router as register_router
 from app.routes.display import router as display_router
+from app.routes.login import router as login_router
+from app.routes.verify import router as verify_router
 
 load_dotenv()  # Loading the environment variables from .env
 
@@ -96,6 +98,8 @@ async def shutdown_event_on_database():
 app.include_router(health_check_router)
 app.include_router(register_router)
 app.include_router(display_router)
+app.include_router(login_router)
+app.include_router(verify_router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

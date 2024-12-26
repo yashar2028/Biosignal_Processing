@@ -13,8 +13,8 @@ async def display(request: Request):
 
     if not user_email:
         response = RedirectResponse(url="/login")
-        message = "In order to access the dashboard you need to login."  # TODO: Capture and show it in login page.
-        response.set_cookie(key="flash_message2", value=message, max_age=10)
+        message = "In order to access the dashboard you need to login."
+        response.set_cookie(key="flash_message", value=message, max_age=10)
         return response
 
     return templates.TemplateResponse(

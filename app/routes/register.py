@@ -81,15 +81,15 @@ async def register_user(
             db.add(new_user)
             await db.commit()
 
-            response = RedirectResponse(url="/display")
+            response = RedirectResponse(url="/login")
             response.set_cookie(
                 key="user_email", value=user.email, max_age=3600
             )  # Setting the user email as session cookie. Expiration in one hour.
 
-            message = "Registration successful! Click on capture to begin Acquisition."
+            message = "Registration successful! Please login."
             response.set_cookie(
                 key="flash_message", value=message, max_age=10
-            )  # Store a flash message for a short time in order to pass it to /display and show the message there.
+            )  # Store a flash message for a short time in order to pass it to /login and show the message there.
 
             return response
 
