@@ -23,6 +23,15 @@ async def verify_otp(
     otp_data: VerifyOTP = Depends(VerifyOTP.form),
 ):
 
+    user_email_exist_in_session = request.cookies.get("user_email")
+    if (
+        user_email_exist_in_session
+    ):  # First check to see if user is already verified.
+        response = RedirectResponse(url="/display")
+        message = "Already verified."
+        response.set_cookie(key="flash_message", value=message, max_age=10)
+        return response
+
     otp_in_cookie = request.cookies.get("otp_token")
     user_email = request.cookies.get("user_email_temporary_session")
 
