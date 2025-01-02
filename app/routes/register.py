@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr
 from werkzeug.security import generate_password_hash
 from fastapi.templating import Jinja2Templates
 
-templates = Jinja2Templates(directory="../../templates")
+templates = Jinja2Templates(directory="../templates")
 router = APIRouter()
 
 

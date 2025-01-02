@@ -9,6 +9,7 @@ in pkgs.mkShell {
     pkgs.pre-commit     # To enable pre-commit hooks (see below)
     pkgs.poetry         # Poetry for dependency management
     pkgs.stdenv.cc.cc.lib   # Include libstdc++
+    pkgs.bluez          # required headers and libraries for Bluetooth connection with bitalino.
   ];
 
 # Add environment variables and enable pre-commit hooks with the Devenv pre-commit module (imported above).

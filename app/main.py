@@ -83,7 +83,7 @@ async def startup_event_on_database():
     alembic_cfg = Config(ALEMBIC_CONFIG)
     command.upgrade(
         alembic_cfg, "head"
-    )  # This will apply all migrations to the latest state upon running the app
+    )  # This will apply all migrations to the latest state upon running the app.
 
 
 @app.on_event("shutdown")

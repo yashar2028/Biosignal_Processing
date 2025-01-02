@@ -24,7 +24,7 @@ email_config = ConnectionConfig(  # Reading the email configration from .env. Be
     VALIDATE_CERTS=os.getenv("VALIDATE_CERTS") == "True",
 )
 
-templates = Jinja2Templates(directory="../../templates")
+templates = Jinja2Templates(directory="../templates")
 router = APIRouter()
 
 
