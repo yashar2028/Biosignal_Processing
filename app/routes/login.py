@@ -18,8 +18,8 @@ email_config = ConnectionConfig(  # Reading the email configration from .env. Be
     MAIL_FROM=os.getenv("MAIL_FROM"),
     MAIL_PORT=int(os.getenv("MAIL_PORT")),
     MAIL_SERVER=os.getenv("MAIL_SERVER"),
-    MAIL_TLS=os.getenv("MAIL_TLS") == "True",
-    MAIL_SSL=os.getenv("MAIL_SSL") == "True",
+    MAIL_STARTTLS=os.getenv("MAIL_TLS") == "True",
+    MAIL_SSL_TLS=os.getenv("MAIL_SSL") == "True",
     USE_CREDENTIALS=os.getenv("USE_CREDENTIALS") == "True",
     VALIDATE_CERTS=os.getenv("VALIDATE_CERTS") == "True",
 )
