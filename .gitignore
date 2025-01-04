@@ -10,3 +10,4 @@ venv/
 *.tmp
 
 .env
+sendgrid.env

@@ -25,6 +25,7 @@ python-multipart = "^0.0.20"
 datetime = "^5.5"
 bitalino = "^1.2.6"
 sendgrid = "^6.11.0"
+fastapi-mail = "^1.4.2"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^3.4.0"
