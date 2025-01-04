@@ -8,5 +8,3 @@ venv/
 # Ignore logs or temporary files
 *.log
 *.tmp
-
-.env
