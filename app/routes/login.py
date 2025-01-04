@@ -8,24 +8,21 @@ from sqlalchemy.future import select
 from pydantic import BaseModel, EmailStr
 from werkzeug.security import check_password_hash
 from fastapi.templating import Jinja2Templates
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from app.dependencies import get_db
+from app.models import User
+
+
+templates = Jinja2Templates(directory="app/templates")
+router = APIRouter()
 
 load_dotenv()
 
-email_config = ConnectionConfig(  # Reading the email configration from .env. Below used to send email.
-    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
-    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
-    MAIL_FROM=os.getenv("MAIL_FROM"),
-    MAIL_PORT=int(os.getenv("MAIL_PORT")),
-    MAIL_SERVER=os.getenv("MAIL_SERVER"),
-    MAIL_STARTTLS=os.getenv("MAIL_TLS") == "True",
-    MAIL_SSL_TLS=os.getenv("MAIL_SSL") == "True",
-    USE_CREDENTIALS=os.getenv("USE_CREDENTIALS") == "True",
-    VALIDATE_CERTS=os.getenv("VALIDATE_CERTS") == "True",
-)
-
-templates = Jinja2Templates(directory="../templates")
-router = APIRouter()
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+SENDGRID_FROM_EMAIL = os.getenv(
+    "SENDGRID_FROM_EMAIL"
+)  # Reading the email configration from .env which is used Below to send email.
 
 
 class Login(BaseModel):
@@ -41,18 +38,43 @@ class Login(BaseModel):
         return cls(email=email, password=password)
 
 
-@router.post("/login", response_class=HTMLResponse, status_code=201)
+async def send_email(to_email: str, subject: str, body: str):
+    """
+    Function to send an email using SendGrid API.
+    """
+    message = Mail(
+        from_email=SENDGRID_FROM_EMAIL,
+        to_emails=to_email,
+        subject=subject,
+        plain_text_content=body,
+    )
+    try:
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        sg.send(message)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An unexpected error occurred: {str(e)}",
+        )
+
+
+@router.get("/", response_class=HTMLResponse)
+async def render_login_page(request: Request):
+    """
+    Handles rendering the login page.
+    """
+    message = request.cookies.get("flash_message", "")
+    return templates.TemplateResponse(
+        "login.html", {"request": request, "flash_message": message}
+    )
+
+
+@router.post("/", response_class=RedirectResponse, status_code=201)
 async def login_user(
     request: Request,
     user: Login = Depends(Login.form),
-    db: AsyncSession = Depends(),
+    db: AsyncSession = Depends(get_db),
 ):
-
-    from app.main import get_db, User
-
-    db: AsyncSession = await get_db().__anext__()  # Get database session
-
-    message = request.cookies.get("flash_message")
 
     if (
         request.headers.get("Content-Type")
@@ -63,13 +85,13 @@ async def login_user(
         if (
             user_email_exist_in_session
         ):  # First check to see if user is already logged in.
-            response = RedirectResponse(url="/display")
+            response = RedirectResponse(url="/display", status_code=303)
             message = "Already logged in."
             response.set_cookie(key="flash_message", value=message, max_age=10)
             return response
 
         try:
-            query = select(User).where(User.email == user.email)
+            query = select(User).filter(User.email == user.email)
             result = await db.execute(query)
             current_user = result.scalar_one_or_none()
 
@@ -84,7 +106,7 @@ async def login_user(
                     },
                 )
 
-            response = RedirectResponse(url="/verify")
+            response = RedirectResponse(url="/verify", status_code=303)
 
             otp_token = secrets.token_urlsafe(
                 16
@@ -103,14 +125,11 @@ async def login_user(
                 secure=True,
             )
 
-            email_message = MessageSchema(
-                subject="Your One-Time Login Token",
-                recipients=[current_user.email],
-                body=f"Your one-time login token is: {otp_token}",
-                subtype="plain",
-            )
-            fm = FastMail(email_config)
-            await fm.send_message(email_message)  # Sent token via email.
+            subject = "Your One-Time Login Token"
+            body = f"Your OTP is: {otp_token}"
+            await send_email(
+                current_user.email, subject, body
+            )  # Sent token via email.
 
             return response
 
@@ -119,7 +138,3 @@ async def login_user(
                 status_code=500,
                 detail=f"An unexpected error occurred: {str(e)}",
             )
-
-    return templates.TemplateResponse(
-        "login.html", {"request": request, "flash_message": message}
-    )

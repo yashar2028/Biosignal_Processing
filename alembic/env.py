@@ -9,9 +9,9 @@ from alembic import context
 
 
 def get_base():
-    from app.main import Base
+    from app.models import Base
 
-    return Base  # Import the Base from your main.py (where your SQLAlchemy models are defined)
+    return Base
 
 
 sys.path.insert(

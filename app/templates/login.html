@@ -74,6 +74,13 @@
     </style>
 </head>
 <body>
+
+    <div class="flash-message">
+    {% if flash_message %}
+        <p>{{ flash_message }}</p>
+    {% endif %}
+    </div>
+
     <div class="login-container">
         <h1>Login</h1>
         <form action="#" method="post">

@@ -5,8 +5,10 @@ from sqlalchemy.future import select
 from pydantic import BaseModel, EmailStr
 from werkzeug.security import generate_password_hash
 from fastapi.templating import Jinja2Templates
+from app.dependencies import get_db
+from app.models import User
 
-templates = Jinja2Templates(directory="../templates")
+templates = Jinja2Templates(directory="app/templates")
 router = APIRouter()
 
 
@@ -37,22 +39,29 @@ class Register(
         )
 
 
-@router.post("/register", response_class=HTMLResponse, status_code=201)
+@router.get("/register", response_class=HTMLResponse)
+async def render_register_page(request: Request):
+    """
+    Handles rendering the register page.
+    """
+    message = request.cookies.get("flash_message", "")
+    return templates.TemplateResponse(
+        "register.html", {"request": request, "flash_message": message}
+    )
+
+
+@router.post("/register", response_class=RedirectResponse, status_code=201)
 async def register_user(
     request: Request,
     user: Register = Depends(Register.form),
-    db: AsyncSession = Depends(),
+    db: AsyncSession = Depends(get_db),
 ):
-
-    # Defer the imports to avoid circular dependencies
-    from app.main import get_db, User
-
-    db: AsyncSession = await get_db().__anext__()  # Get database session
 
     if (
         request.headers.get("Content-Type")
         == "application/x-www-form-urlencoded"
     ):
+
         hashed_password = generate_password_hash(user.password)
         new_user = User(
             first_name=user.first_name,
@@ -63,7 +72,7 @@ async def register_user(
         )
 
         try:
-            user = select(User).filter_by(email=user.email)
+            user = select(User).filter(User.email == user.email)
             result = await db.execute(user)
             user_exists = (
                 result.scalar_one_or_none()
@@ -81,7 +90,7 @@ async def register_user(
             db.add(new_user)
             await db.commit()
 
-            response = RedirectResponse(url="/login")
+            response = RedirectResponse(url="/", status_code=303)
             response.set_cookie(
                 key="user_email", value=user.email, max_age=3600
             )  # Setting the user email as session cookie. Expiration in one hour.
@@ -106,5 +115,3 @@ async def register_user(
                     "flash_message": "Registration Failed! Please try again.",
                 },
             )  # Failure message.
-
-    return templates.TemplateResponse("register.html", {"request": request})

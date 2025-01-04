@@ -6,16 +6,16 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="../templates")
+templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/display", response_class=HTMLResponse, status_code=200)
 async def display(request: Request):
     user_email = request.cookies.get("user_email")
-    message = request.cookies.get("flash_message")
+    message = request.cookies.get("flash_message", "")  # Default msg value ""
 
     if not user_email:
-        response = RedirectResponse(url="/login")
+        response = RedirectResponse(url="/")
         message = "In order to access the dashboard you need to login."
         response.set_cookie(key="flash_message", value=message, max_age=10)
         return response
