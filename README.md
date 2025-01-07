@@ -1,11 +1,11 @@
 ## Project Overview
-...
+This is an independant application that requires only a Bitalino sensor set to capture, display and analyze the EEG signal acquired from a subject. This application is also developed as the project for Innovation and Complexity Management and Media Management courses.
 
 ## Prerequisites
 - Python 3.11
 - 'devenv' for environment management
 
-## Project Setup
+## Project Setup (Devs)
 
 #### 1. Clone the repository:
    ```bash
@@ -22,8 +22,9 @@
    nix-env -iA nixpkgs.devenv
    ```
 
-#### 3. Make the bash script executable and run the script:
+#### 3. Make the bash scripts executable and run the setup script to enter developement environment:
    ```bash
+   chmod +x start_db.sh
    chmod +x setup.sh
    ./scripts/setup.sh
    ```
@@ -33,3 +34,4 @@
    ./scripts/start_db.sh
    poetry run uvicorn main:app --reload
    ```
+## Run the app (Users)
