@@ -27,7 +27,12 @@
             <p>{{ flash_message }}</p>
         {% endif %}
     </div>
-        <script>
+
+    <div class="button-container">
+        <button onclick="startDevice()">Capture</button>
+    </div>
+
+    <script>
     // Fetch the signal data passed from the backend
     const signalData = {{ signal_data|tojson }};
 
@@ -103,8 +108,7 @@
             .attr("d", line2);
     }
 
-    // Button handler
-    function startDevice() {
+    function startDevice() { // This handles the button.
         fetch("/start-device", { method: "POST" })
             .then(response => response.redirected ? window.location.href = response.url : null)
             .catch(err => console.error("Error starting device:", err));
