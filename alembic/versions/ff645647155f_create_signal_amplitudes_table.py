@@ -21,7 +21,8 @@ def upgrade() -> None:
     op.create_table(
         "signal_amplitudes",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("amplitude", sa.Float(), nullable=True),
+        sa.Column("first_channel", sa.Float(), nullable=True),
+        sa.Column("second_channel", sa.Float(), nullable=True),
         sa.Column("timestamp", sa.DateTime(timezone=True), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )

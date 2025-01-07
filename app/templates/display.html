@@ -3,16 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display Page</title>
+    <title>Display Signals</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        #chart {
+            width: 100%;
+            height: 400px;
+        }
+        .flash-message {
+            margin-bottom: 10px;
+            color: green;
+        }
+    </style>
 </head>
 <body>
-
     <div class="flash-message">
-    {% if flash_message %}
-        <p>{{ flash_message }}</p>
-    {% endif %}
+        {% if flash_message %}
+            <p>{{ flash_message }}</p>
+        {% endif %}
     </div>
-        <h1>Hello</h1>
+        <script>
+    // Fetch the signal data passed from the backend
+    const signalData = {{ signal_data|tojson }};
+
+    const svg = d3.select("#chart")
+        .append("svg")
+        .attr("width", 800)
+        .attr("height", 400);
+
+    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const width = +svg.attr("width") - margin.left - margin.right;
+    const height = +svg.attr("height") - margin.top - margin.bottom;
+
+    const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    if (signalData.length === 0) {
+        // Handle empty data: display a message
+        svg.append("text")
+            .attr("x", 400) // Center the text horizontally
+            .attr("y", 200) // Center the text vertically
+            .attr("text-anchor", "middle")
+            .text("No data available")
+            .style("fill", "gray")
+            .style("font-size", "20px");
+    } else {
+        // Parse timestamps and values
+        const parsedData = signalData.map(d => ({
+            timestamp: new Date(d.timestamp),
+            first_channel: d.first_channel,
+            second_channel: d.second_channel,
+        }));
+
+        // Set up scales
+        const x = d3.scaleTime()
+            .domain(d3.extent(parsedData, d => d.timestamp))
+            .range([0, width]);
+
+        const y = d3.scaleLinear()
+            .domain([d3.min(parsedData, d => Math.min(d.first_channel, d.second_channel)),
+                     d3.max(parsedData, d => Math.max(d.first_channel, d.second_channel))])
+            .nice()
+            .range([height, 0]);
+
+        // Add axes
+        g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .call(d3.axisLeft(y));
+
+        // Add lines for each channel
+        const line1 = d3.line()
+            .x(d => x(d.timestamp))
+            .y(d => y(d.first_channel));
+
+        const line2 = d3.line()
+            .x(d => x(d.timestamp))
+            .y(d => y(d.second_channel));
+
+        g.append("path")
+            .datum(parsedData)
+            .attr("fill", "none")
+            .attr("stroke", "blue")
+            .attr("stroke-width", 1.5)
+            .attr("d", line1);
+
+        g.append("path")
+            .datum(parsedData)
+            .attr("fill", "none")
+            .attr("stroke", "red")
+            .attr("stroke-width", 1.5)
+            .attr("d", line2);
+    }
+
+    // Button handler
+    function startDevice() {
+        fetch("/start-device", { method: "POST" })
+            .then(response => response.redirected ? window.location.href = response.url : null)
+            .catch(err => console.error("Error starting device:", err));
+    }
+    </script>
 </body>
 </html>
 

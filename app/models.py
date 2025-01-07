@@ -10,7 +10,8 @@ class SignalAmplitude(Base):
     __tablename__ = "signal_amplitudes"
 
     id = Column(Integer, primary_key=True)
-    amplitude = Column(Float)
+    first_channel = Column(Float)
+    second_channel = Column(Float)
     timestamp = Column(DateTime(timezone=True))
 
 
