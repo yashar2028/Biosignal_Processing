@@ -7,17 +7,15 @@ DB_PASSWORD="12345678910"
 DB_PORT=5432
 DB_CONTAINER_NAME="postgres_database"
 
-# Check if the container is already running
-if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
-  echo "PostgreSQL container is already running."
-  exit 0
-fi
+# Check if the container exists (whether stopped or running)
+EXISTING_CONTAINER=$(docker ps -aq -f name=$DB_CONTAINER_NAME)
 
-# Check if the container exists but is not running
-if [ "$(docker ps -aq -f name=$DB_CONTAINER_NAME)" ]; then
+if [ "$EXISTING_CONTAINER" ]; then
+  # If container exists, try to start it
   echo "Starting existing PostgreSQL container."
   docker start $DB_CONTAINER_NAME
 else
+  # If container doesn't exist, run a new PostgreSQL container
   echo "Running a new PostgreSQL container."
   docker run --name $DB_CONTAINER_NAME \
     -e POSTGRES_USER=$DB_USER \

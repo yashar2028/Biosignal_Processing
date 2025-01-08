@@ -1,7 +1,8 @@
 import uvicorn
 from fastapi import FastAPI
-from alembic import command
-from alembic.config import Config
+
+# from alembic import command
+# from alembic.config import Config
 
 from app.models import Base
 from app.dependencies import engine
@@ -36,10 +37,10 @@ async def startup_event_on_database():
 
     await init_db()
 
-    alembic_cfg = Config(ALEMBIC_CONFIG)
-    command.upgrade(
-        alembic_cfg, "head"
-    )  # This will apply all migrations to the latest state upon running the app.
+    # alembic_cfg = Config(ALEMBIC_CONFIG)  # Uncomment these (two imports above as well) when a new change to datbase is added and run the app. Not needed for users on Docker.
+    # command.upgrade(
+    #    alembic_cfg, "head"
+    # )  # This will apply all migrations to the latest state upon running the app.
 
 
 @app.on_event("shutdown")
