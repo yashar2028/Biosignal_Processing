@@ -110,8 +110,14 @@
 
     function startDevice() { // This handles the button.
         fetch("/start-device", { method: "POST" })
-            .then(response => response.redirected ? window.location.href = response.url : null)
-            .catch(err => console.error("Error starting device:", err));
+    .then(response => {
+        if (response.ok && response.redirected) {
+            window.location.href = response.url;
+        } else {
+            console.error("Failed to start device:", response.statusText);
+        }
+    })
+    .catch(err => console.error("Error starting device:", err));
     }
     </script>
 </body>

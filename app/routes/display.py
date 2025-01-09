@@ -1,4 +1,5 @@
 import os
+import asyncio
 import logging
 import pandas as pd
 from datetime import datetime, timedelta
@@ -71,10 +72,10 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
     try:
         csv_folder = "csv_output"
 
-        device = BITalino(device_address)
+        device = await asyncio.to_thread(BITalino, device_address)
 
         eeg_channels = [2, 3]
-        device.start(sampling_rate, eeg_channels)
+        await asyncio.to_thread(device.start, sampling_rate, eeg_channels)
 
         start_time_utc = datetime.utcnow()
 
@@ -127,6 +128,7 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
         return response
 
     except Exception as e:
+        logging.error(f"Error capturing data: {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"An error occurred while capturing data: {str(e)}",
@@ -135,4 +137,10 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
     finally:
 
         if "device" in locals():
-            device.close()
+            try:
+                await asyncio.to_thread(device.close)
+            except Exception as cleanup_error:
+                logging.error(
+                    f"Failed to close BITalino device: {cleanup_error}",
+                    exc_info=True,
+                )
