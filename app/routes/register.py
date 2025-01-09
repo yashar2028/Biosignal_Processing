@@ -72,8 +72,8 @@ async def register_user(
         )
 
         try:
-            user = select(User).filter(User.email == user.email)
-            result = await db.execute(user)
+            query = select(User).filter(User.email == user.email)
+            result = await db.execute(query)
             user_exists = (
                 result.scalar_one_or_none()
             )  # This returns None or the user if it was found.
