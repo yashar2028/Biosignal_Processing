@@ -31,8 +31,7 @@ async def display(request: Request, db: AsyncSession = Depends(get_db)):
             response.set_cookie(key="flash_message", value=message, max_age=10)
             return response
 
-        # Query the database to get the captured data
-        result = await db.execute(
+        result = await db.execute(  # Query the cpatured data from database.
             select(SignalAmplitude).order_by(SignalAmplitude.timestamp)
         )
         signals = result.scalars().all()
@@ -68,9 +67,12 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
     device_address = "98:D3:11:FD:1F:3A"
     sampling_rate = 100
     duration = 20
+    csv_folder = "csv_output"
 
     try:
-        csv_folder = "csv_output"
+        os.makedirs(
+            csv_folder, exist_ok=True
+        )  # Check if the output folder exists
 
         device = await asyncio.to_thread(BITalino, device_address)
 
@@ -128,7 +130,7 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
         return response
 
     except Exception as e:
-        logging.error(f"Error capturing data: {e}", exc_info=True)
+        logging.error(f"Error starting BITalino: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"An error occurred while capturing data: {str(e)}",

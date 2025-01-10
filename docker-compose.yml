@@ -15,6 +15,14 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_HOST=db  # Pointing to the db container below.
       - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - DBUS_SESSION_BUS_ADDRESS=/var/run/dbus/system_bus_socket
+    privileged: true  # Grant container elevated permissions
+    network_mode: host  # Enable host networking for Bluetooth
+    volumes:
+      - /var/run/dbus:/var/run/dbus  # Mount the system D-Bus socket
+    devices:
+      - /dev/rfcomm0:/dev/rfcomm0  # Expose the Bluetooth device
+
   db:
     image: postgres:15
     container_name: postgres_database_for_compose
@@ -34,4 +42,5 @@ services:
 
 volumes:
   db_data:
+
 
