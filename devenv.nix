@@ -14,7 +14,7 @@ in pkgs.mkShell {
 
 # Add environment variables and enable pre-commit hooks with the Devenv pre-commit module (imported above).
   shellHook = ''
-    export LD_LIBRARY_PATH=/nix/store/40yjzm7r5ki59kkk9423dnwbm86x7pyd-gcc-13.2.0-lib/lib:$LD_LIBRARY_PATH # Exposing the path of libstdc++ to the environment.
+    export LD_LIBRARY_PATH=/nix/store/40yjzm7r5ki59kkk9423dnwbm86x7pyd-gcc-13.2.0-lib/lib:$LD_LIBRARY_PATH # Exposing the path of libstdc++ to the environment. 
     echo "Welcome to the Biosignal Project Dev Environment!"
     echo "Python version: $(python3 --version)"
     echo "Run 'poetry run uvicorn app.main:app' to start the server."

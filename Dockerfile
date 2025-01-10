@@ -6,13 +6,14 @@ FROM python:3.11-slim
 # Install system dependencies (compilers and libraries required for building certain Python packages)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    bluez \
     gcc \
     libpq-dev \
     make \
     libbluetooth-dev \
     libc6-dev \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+    curl && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 - --yes
