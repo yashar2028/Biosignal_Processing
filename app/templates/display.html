@@ -32,6 +32,8 @@
         <button onclick="startDevice()">Capture</button>
     </div>
 
+    <div id="chart"></div>
+
     <script>
     // Fetch the signal data passed from the backend
     const signalData = {{ signal_data|tojson }};
