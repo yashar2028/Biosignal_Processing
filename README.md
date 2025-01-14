@@ -38,5 +38,13 @@ This is an independant application that requires only a Bitalino sensor set to c
    ```bash
    docker-compose up --build
    ```
+## Contributers
+Backend Developement: [Yashar Najafi](https://github.com/yashar2028)
+
+Signal Processing and Hardware Connection: [Sina Najafi](https://github.com/SinaNajafi1)
+
+Sensor Hardware and Hardware Connection: [Sepehr Hajimokhtar](https://github.com/sepehrmokhtar)
+
+Frontend Developement: [Parnian Taji](https://github.com/ParnianTaji)
 ##
 <img src="https://github.com/user-attachments/assets/4d358e72-d39e-4db6-999c-21cf98acf878" alt="syps 300dpi-01" width="100">
