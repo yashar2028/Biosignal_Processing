@@ -35,3 +35,8 @@ This is an independant application that requires only a Bitalino sensor set to c
    poetry run uvicorn main:app --reload
    ```
 ## Run the app (Users)
+   ```bash
+   docker-compose up --build
+   ```
+##
+<img src="https://github.com/user-attachments/assets/4d358e72-d39e-4db6-999c-21cf98acf878" alt="syps 300dpi-01" width="100">
