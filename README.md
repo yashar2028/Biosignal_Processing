@@ -1,5 +1,5 @@
 ## Project Overview
-This is an independant application that requires only a Bitalino sensor set to capture, display and analyze the EEG signal acquired from a subject. This application is also developed as the project for Innovation and Complexity Management and Media Management courses. Analysis code and hardware connection code can be found in the analysis notebook as well. Note that the analysis code is not as same as theone used in the application (for example pandas library is not included in the application).
+This is an independant application that requires only a Bitalino sensor set to capture, display and analyze the EEG signal acquired from a subject. This application is also developed as the project for Innovation and Complexity Management and Media Management courses. Analysis code and hardware connection code can be found in the analysis notebook as well. Note that the analysis code is not as same as the one used in the application (for example pandas library is not included in the application).
 ## Prerequisites
 - Python 3.11
 - 'devenv' for environment management
