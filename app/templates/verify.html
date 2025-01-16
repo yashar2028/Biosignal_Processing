@@ -55,16 +55,16 @@
         .verify-container button:hover {
             background-color: #777;
         }
+        .flash-message {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+                       }
     </style>
 </head>
 <body>
-
-    <div class="flash-message">
-    {% if flash_message %}
-        <p>{{ flash_message }}</p>
-    {% endif %}
-    </div>
-
     <div class="verify-container">
         <h1>OTP-Token</h1>
         <form action="/verify" method="post">
@@ -72,6 +72,12 @@
             <button type="submit">Verify</button>
         </form>
     </div>
+
+    <div class="flash-message">
+        {% if flash_message %}
+            <p>{{ flash_message }}</p>
+        {% endif %}
+        </div>
 </body>
 </html>
 

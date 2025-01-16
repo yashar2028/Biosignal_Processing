@@ -54,16 +54,16 @@
         .register-container button:hover {
             background-color: #777;
         }
+        .flash-message {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+                       }
     </style>
 </head>
 <body>
-
-    <div class="flash-message">
-    {% if flash_message %}
-        <p>{{ flash_message }}</p>
-    {% endif %}
-    </div>
-
     <div class="register-container">
         <h1>Register</h1>
         <form action="/register" method="post">
@@ -75,6 +75,12 @@
             <button type="submit">Register</button>
         </form>
     </div>
+
+    <div class="flash-message">
+        {% if flash_message %}
+            <p>{{ flash_message }}</p>
+        {% endif %}
+        </div>
 </body>
 </html>
 
