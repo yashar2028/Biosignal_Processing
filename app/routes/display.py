@@ -100,10 +100,6 @@ def detect_closed_eyes_minima(
 
     relative_power = band_power / total_power
 
-    print(f"Total Power: {total_power}")
-    print(f"Band Power: {band_power}")
-    print(f"Relative Power: {band_power / total_power}")
-
     if (
         relative_power > threshold
     ):  # Compration with threshhold. The threshhold was concluded as result of experiments.
