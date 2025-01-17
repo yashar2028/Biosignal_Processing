@@ -42,8 +42,15 @@ body {
     margin-bottom: 20px;
 }
 
-.login-container input[type="text"],
-.login-container input[type="password"] {
+.login-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.login-container input {
+    width: 100%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
@@ -53,6 +60,7 @@ body {
 }
 
 .login-container button {
+    width: 100%;
     padding: 10px;
     margin-top: 10px;
     border: none;
@@ -84,43 +92,6 @@ body {
 .register-button:hover {
     background-color: #fff;
     color: #000;
-}
-
-/* Signal Display Page */
-.button-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.button-container button {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.button-container button:hover {
-    background-color: #0056b3;
-}
-
-#chart {
-    width: 100%;
-    max-width: 800px;
-    height: 400px;
-    margin: 0 auto;
-    background-color: #1a1a1a;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
-    padding: 10px;
-}
-
-h2 {
-    text-align: center;
-    margin-top: 20px;
 }
 
 p {
