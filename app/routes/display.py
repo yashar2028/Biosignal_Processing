@@ -14,6 +14,7 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from app.dependencies import get_db
 from app.models import SignalAmplitude
+from app.socket import manager
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -178,6 +179,8 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
             csv_folder, exist_ok=True
         )  # Check if the output folder exists
 
+        await manager.broadcast("Acquisition started. Capturing...")
+
         device = await asyncio.to_thread(BITalino, device_address)
 
         eeg_channels = [2, 3]
@@ -203,7 +206,7 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
             eeg_data_list_a4.append(eeg_signal_a4)
             time_list.append(current_time_utc)
 
-            new_signal = SignalAmplitude(  # Here each signal value in each channel is creted and added to database along with the timestamp.
+            new_signal = SignalAmplitude(  # Here each signal value in each channel is created and added to database along with the timestamp.
                 first_channel=eeg_signal_a3,
                 second_channel=eeg_signal_a4,
                 timestamp=current_time_utc,
@@ -226,9 +229,11 @@ async def start_device(request: Request, db: AsyncSession = Depends(get_db)):
             ):
                 writer.writerow([timestamp, a3, a4])
 
-        flash_message = (
-            f"Data capture complete! Data saved to {csv_file} at csv_output."
+        await manager.broadcast(
+            "Acquisition completed! Please refresh the page."
         )
+
+        flash_message = f"Data saved to {csv_file}."
         response = RedirectResponse(url="/display")
         response.set_cookie("flash_message", value=flash_message, max_age=10)
 
