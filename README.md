@@ -4,7 +4,7 @@ This is an independant application that requires only a Bitalino sensor set to c
 - Python 3.11
 - 'devenv' for environment management
 
-Below is the set up and running for users. Make sure that you include the .env file. The environment variables are added in repository settings at codespace secrets.
+Below is the set up and running for users. Make sure that you include the .env file. The environment variables are added in repository settings at codespace secrets but the security restrictions regardingthe email API Key which is used for OTP verification still remains and codespace does not read the key. The recommendation is to run the app as dev set up or using docker in a local environment where .envshould be included. Database dump is also included in the compose file so static data is served on the graph.
 ## Project Setup (Devs)
 
 #### 1. Clone the repository:
@@ -22,10 +22,8 @@ Below is the set up and running for users. Make sure that you include the .env f
    nix-env -iA nixpkgs.devenv
    ```
 
-#### 3. Make the bash scripts executable and run the setup script to enter developement environment:
+#### 3. Run the setup script to enter developement environment:
    ```bash
-   chmod +x start_db.sh
-   chmod +x setup.sh
    ./scripts/setup.sh
    ```
 
