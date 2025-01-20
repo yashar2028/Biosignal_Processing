@@ -13,7 +13,6 @@ from app.routes.display import router as display_router
 from app.routes.login import router as login_router
 from app.routes.verify import router as verify_router
 from app.socket import router as websocket_router
-from app.routes.clear_session import router as clear_session_router
 
 
 async def init_db():
@@ -62,7 +61,6 @@ app.include_router(display_router)
 app.include_router(login_router)
 app.include_router(verify_router)
 app.include_router(websocket_router)
-app.include_router(clear_session_router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
