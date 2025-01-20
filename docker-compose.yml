@@ -3,8 +3,8 @@ services:
     build: .  # Build the app image from the Dockerfile
     ports:
       - "8000:8000"
-    env_file:
-      - .env
+    # env_file: # Only when running locally with precense of .env
+    #  - .env
     depends_on:
       - db
     command: >
