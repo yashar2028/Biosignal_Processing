@@ -4,7 +4,9 @@ This is an independant application that requires only a Bitalino sensor set to c
 - Python 3.11
 - 'devenv' for environment management
 
-Below is the set up and running for users. Make sure that you include the .env file. The environment variables are added in repository settings at codespace secrets but the security restrictions regardingthe email API Key which is used for OTP verification still remains and codespace does not read the key. The recommendation is to run the app as dev set up or using docker in a local environment where .envshould be included. Database dump is also included in the compose file so static data is served on the graph.
+Below is the set up and running for users. Make sure that you include the .env file. The environment variables are added in repository settings at codespace so no need fro manually importing .env. The app can be run with docker compose. Database dump is also included in the compose file so static data is served on the graph.
+
+Note on verification: Running locally you can also have the OTP verification functionality which is tested and working, but for the purpose of containerization I excluded this feature (commented) so a simple login will direct to graph display page. This happens because the API_KEY is not read with docker nor on codespace with variables.
 ## Project Setup (Devs)
 
 #### 1. Clone the repository:
