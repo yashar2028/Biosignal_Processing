@@ -5,7 +5,7 @@ This is an independant application that requires only a Bitalino sensor set to c
 - 'devenv' for environment management
 
 Below is the set up and running for users. Make sure that you include the .env file. Find the example of .env at .env.example. You only need to change the email configuration.
-## Project Setup (Devs)
+## Project Setup (Devs) (Recommended)
 
 #### 1. Clone the repository:
    ```bash
