@@ -85,7 +85,9 @@ async def login_user(
         == "application/x-www-form-urlencoded"
     ):
 
-        user_email_exist_in_session = request.cookies.get("user_email")
+        user_email_exist_in_session = request.cookies.get(
+            "user_email_temporary_session"
+        )  # Changed user_email cookie to user_email_temporary_session.
         if (
             user_email_exist_in_session
         ):  # First check to see if user is already logged in.
