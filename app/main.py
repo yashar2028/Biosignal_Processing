@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 # from alembic import command
 # from alembic.config import Config
@@ -28,6 +29,7 @@ async def close_db():
 
 app = FastAPI()
 ALEMBIC_CONFIG = "alembic.ini"
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
 @app.on_event("startup")

@@ -1,77 +1,565 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display Signals</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-body {
-    margin: 0;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    background-color: #000;
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <head>
+      <title>Dashboard</title>
+      <script src="https://d3js.org/d3.v7.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.7.1.slim.js" integrity="sha256-UgvvN8vBkgO0luPSUl2s8TIlOSYRoGFAX4jlCIm9Adc=" crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+      <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+      <script>
+        
+    $(document).ready(function () {
+      // ------- TIMER ------- //
+      let hour = 0, minutes = 0, seconds = 0;
 
-.flash-message {
-    margin-top: 20px;
-    color: #fff;
-    text-align: center;
-}
+      setInterval(function () {
+        seconds += 1;
+        if (seconds >= 60) {
+          seconds = 0;
+          minutes += 1;
+        }
+        if (minutes >= 60) {
+          minutes = 0;
+          hour += 1;
+        }
 
-.button-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
+        // Update Timer
+        $("#spH").text(hour);
+        $("#spM").text(minutes);
+        $("#spS").text(seconds);
+      }, 1000);
 
-.button-container button {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+      // ------- DRIVING SPEED ------- //
+      let countdown = document.getElementById("countdown");
+      countdown.textContent = "60"; // Starting speed
+      let timer;
 
-#chart {
-    width: 100%;
-    max-width: 800px;
-    height: 400px;
-    margin: 20px 0;
-    background-color: #1a1a1a;
-    border-radius: 8px;
-    box-shadow: 0 8px 16px rgba(128, 128, 128, 0.6);
-    padding: 10px;
-}
+      function countItDown() {
+        let currentSpeed = parseFloat(countdown.textContent);
+        let change = 0;
+        let randomChange = Math.random();
 
-    </style>
-</head>
-<body>
-    <h1>Display Signal</h1>
-    <h2>Analysis Result</h2>
-    <p>{{ analysis_result }}</p>
-    <div id="chart"></div>
+        // Randomly increase, decrease, or maintain speed
+        if (randomChange < 0.6) {
+          change = Math.floor(Math.random() * 10 + 1); // +1 to +10 mph
+        } else if (randomChange < 0.9) {
+          change = -Math.floor(Math.random() * 10 + 1); // -1 to -10 mph
+        }
 
-    <div class="button-container">
-        <button onclick="startDevice()">Capture</button>
-    </div>
+        let newSpeed = currentSpeed + change;
+        if (newSpeed < 20) newSpeed = 20;
+        if (newSpeed > 200) newSpeed = 200;
 
-    <div class="flash-message">
-        {% if flash_message %}
-            <p>{{ flash_message }}</p>
-        {% endif %}
-    </div>
+        countdown.textContent = newSpeed.toFixed(0);
 
-    <div id="status-message"></div>
-    
-    <script>
+        // New random interval
+        let randomInterval = Math.floor(Math.random() * 400) + 100;
+        clearInterval(timer);
+        timer = setInterval(countItDown, randomInterval);
+      }
+
+      timer = setInterval(countItDown, 100);
+
+      // ------- ANIMATIONS ------- //
+      let mode = "home";
+
+      $("#main").on("touchstart", function () {
+        $(this).addClass("active");
+      }).on("touchend", function () {
+        $(this).removeClass("active");
+      });
+
+      $('#main').click(function () {
+        if (mode === "home") {
+          gsap.to('#home', { y: -360, duration: 0.4 });
+          gsap.fromTo('#car', { y: 360, autoAlpha: 1 }, { y: 0, duration: 0.4 });
+          mode = "car";
+        } else if (mode === "car") {
+          gsap.to('#car', { y: -360, duration: 0.4 });
+          gsap.fromTo('#cardva', { y: 360, autoAlpha: 1 }, { y: 0, duration: 0.4 });
+          mode = "cardva";
+        } else if (mode === "cardva") {
+          gsap.to('#home', { y: 0, duration: 0.2 });
+          gsap.fromTo('#cardva', { y: 0, autoAlpha: 1 }, { y: 360, duration: 0.2 });
+          mode = "home";
+        }
+      });
+
+      // Radial ticks for animation
+      function makeRadial(options) {
+        if (options && options.el) {
+          let el = options.el;
+          let radials = options.radials || 60;
+          let degrees = 360 / radials;
+          for (let i = 0; i < radials / 2; i++) {
+            let newTick = $('<div class="tick"></div>').css({
+              transform: `rotate(${i * degrees}deg)`,
+            });
+            el.prepend(newTick);
+          }
+        }
+      }
+
+      makeRadial({ el: $('#radial'), radials: 100 });
+    });
+         $(document).ready(function(){
+
+            var hour=0,minutes=0,seconds=0;
+            let img=document.getElementById('battryImg');
+	    let SWimg=document.getElementById('steeringwheel');
+            setInterval(function(){
+                seconds+=1;
+                if(seconds>=60){
+                    seconds=0;
+                    minutes+=1;
+                }
+                if(minutes>=60){
+                    minutes=0;
+                    hour+=1;
+                }
+
+                if(minutes>=1){
+                    img.src="battry4.png";
+                }
+                if(minutes>=2){
+                    img.src="battry3.png";
+                }
+                if(minutes>=3){
+                    img.src="battry2.png";
+                }
+                if(minutes>=4){
+                    img.src="battry1.png";
+                    setInterval(function(){
+                        Lowbattery();
+                    },)
+                }
+                if(minutes>=2){
+                SWimg.src="steering_wheel_red.png";
+                setInterval(
+                function(){
+                   danger();
+                } ,)
+            }
+                document.getElementById("spH").innerHTML=hour;
+                document.getElementById("spM").innerHTML=minutes;
+                document.getElementById("spS").innerHTML=seconds;
+
+             },1000)
+
+            function danger(){
+               $('.fade').fadeTo(200,0).fadeTo(200,1);
+            }
+            function Lowbattery(){
+               $('#battryImg').fadeTo(200,0).fadeTo(200,1);
+            } 
+            
+           // -------COUNTER (Driving Speed)------- //
+
+            var countdown = document.getElementById("countdown");
+
+            // Function to update speed randomly
+            var countItDown = function () {
+              var currentTime = parseFloat(countdown.textContent);
+              var change = 0; // Default change is 0 for stability
+
+              // Generate a random number to determine the type of change
+              var randomChange = Math.random();
+
+              if (randomChange < 0.6) {
+                // 60% chance for an increase
+                change = Math.floor(Math.random() * 10 + 1); // Increase by +1 to +10 mph
+              } else if (randomChange < 0.9) {
+                // 30% chance for a decrease
+                change = -Math.floor(Math.random() * 10 + 1); // Decrease by -1 to -10 mph
+              }
+              // 10% chance for no change (default)
+
+              // Update the speed
+              var newSpeed = currentTime + change;
+
+              // Enforce min and max limits
+              if (newSpeed < 20) newSpeed = 20;
+              if (newSpeed > 200) newSpeed = 200;
+
+              countdown.textContent = newSpeed.toFixed(0);
+
+              // Set a new random interval between 100ms and 500ms
+              var randomInterval = Math.floor(Math.random() * 400) + 100;
+              clearInterval(timer);
+              timer = setInterval(countItDown, randomInterval);
+            };
+
+            }); 
+      </script>
+      <style>
+          body {
+          margin: 0;
+          padding: 20px;
+          font-family: Arial, sans-serif;
+          background-color: #000;
+          color: #fff;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-height: 100vh;
+      }
+
+      .flash-message {
+          margin-top: 20px;
+          color: #fff;
+          text-align: center;
+      }
+
+      .button-container {
+          text-align: center;
+          margin-bottom: 20px;
+          margin-left: 10px;
+      }
+
+      .button-container button {
+          padding: 10px 20px;
+          background-color: #007BFF;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          font-size: 16px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+      }
+
+      #chart {
+          width: 100%;
+          max-width: 840px;
+          height: 400px;
+          margin: 20px 0;
+          margin-left: 50px;
+          background-color: #1a1a1a;
+          border-radius: 8px;
+          box-shadow: 0 8px 16px rgba(128, 128, 128, 0.6);
+          padding: 10px;
+          
+      }                  
+
+            *, *:before, *:after {
+            box-sizing: border-box;
+            -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                    user-select: none;
+            }
+
+ 
+
+            a, h1, h2, h3 {
+
+            line-height: 1;
+            }
+
+            .table {
+            display: table;
+            width: 100%;
+            
+            height: 100%;
+            }
+
+            .table-cell {
+            display: table-cell;
+            vertical-align: middle;
+            }
+
+            #main {
+            width: 400px;
+            height: 400px;
+            cursor: pointer;
+            -webkit-transition: -webkit-transform 0.1s;
+            transition: -webkit-transform 0.1s;
+            transition: transform 0.1s;
+            transition: transform 0.1s, -webkit-transform 0.1s;
+            border-radius: 400px;
+            background: -webkit-linear-gradient(285deg, #00a8ff 0%, #cc00ff 100%);
+            background: linear-gradient(165deg, #00a8ff 0%, #cc00ff 100%);
+            margin: 0 auto;
+            box-shadow: 0 0 90px rgba(0, 0, 255, 0.6);
+            }
+
+            #screen {
+            color: #fff;
+            z-index: 100;
+            -webkit-font-smoothing: antialiased;
+            font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+            background: #010101;
+            width: 380px;
+            height: 380px;
+            margin: 10px;
+            border-radius: 100%;
+            position: absolute;
+            overflow: hidden;
+            }
+
+            #radial {
+            position: absolute;
+            margin: 20px;
+            width: 340px;
+            height: 340px;
+            opacity: 0.5;
+            }
+            #radial #empty {
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            background-color: #000;
+            border-radius: 100%;
+            left: 5%;
+            top: 5%;
+            pointer-events: none;
+            }
+            #radial .tick {
+            position: absolute;
+            width: 1.5px;
+            height: 100%;
+            left: 50%;
+            margin-left: -1px;
+            background: #fff;
+            pointer-events: none;
+            }
+
+            #home {
+            position: absolute;
+            mix-blend-mode: screen;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            }
+            #home h1 {
+
+            position: absolute;
+            top: 55%;
+            margin-top: -55px;
+            line-height: 100px;
+            text-align: center;
+            font-size: 110px;
+            width: 100%;
+            letter-spacing: 5px;
+            }
+            #home #mph {
+            color: fff;
+            opacity: 1;
+            position: absolute;
+            width: 100%;
+            bottom: 70px;
+            text-align: center;
+            font-size: 52px;
+            letter-spacing: 0.25px;
+            text-transform: uppercase;
+            font-weight: 100;
+            }
+            #home #status, #home h2 {
+            width: 100%;
+            font-size: 29px;
+            opacity: 1;
+            letter-spacing: 0.25px;
+            position: absolute;
+            top: 110px;
+            text-transform: uppercase;
+            color: #00a8ff;
+            font-weight: 200;
+            text-align: center;
+            }
+
+            #home #icon img {
+            width: 55px;
+            
+            opacity: 1;
+            letter-spacing: 0.25px;
+            position: absolute;
+            top: 75px;
+            left: 162px;
+            text-transform: uppercase;
+            color: #00a8ff;
+            font-weight: bold;
+            text-align: center;
+            }
+
+            #main.pressed, #main:active {
+            -webkit-transform: scale(0.9875);
+                    transform: scale(0.9875);
+            opacity: 0.7;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            }
+
+            #car {
+            mix-blend-mode: screen;
+            position: relative;
+            opacity: 0;
+            }
+            #car img {
+            width: 140px;
+            display: block;
+            position: absolute;
+            margin-top: 160px;
+            left: 115px;
+            }
+            #car h2 {
+            width: 100%;
+            font-size: 30px;
+            letter-spacing: 0.25px;
+            position: absolute;
+            top: 35px;
+            text-transform: uppercase;
+            font-weight: 300;
+            text-align: center;
+            position: absolute;
+            }
+            #car h3 {
+            width: 100%;
+            font-size: 20px;
+            opacity: 1;
+            letter-spacing: 0.25px;
+            position: absolute;
+            top: 240px;
+            text-transform: uppercase;
+            font-weight: normal;
+            text-align: center;
+            color: #fff;
+            }
+            #car h3 .small {
+            font-size: 15px;
+            display: block;
+            font-weight: 300;
+            color: #cc00ff;
+            line-height: 2;
+            }
+
+
+            /* third screen style */
+
+            #cardva {
+            mix-blend-mode: screen;
+            position: relative;
+            opacity: 0;
+            }
+            #cardva img {
+            width: 33px;
+            display: block;
+            position: absolute;
+            margin-top: 145px;
+            left: 175px;
+            }
+            #cardva h2 {
+            width: 100%;
+            font-size: 30px;
+            letter-spacing: 0.25px;
+            position: absolute;
+            top: 35px;
+            text-transform: uppercase;
+            font-weight: 300;
+            text-align: center;
+            position: absolute;
+            opacity: 1;
+            }
+            #cardva h3 {
+            width: 100%;
+            font-size: 56px;
+            opacity: 1;
+            letter-spacing: 0.25px;
+            position: absolute;
+            top: 210px;
+            text-transform: uppercase;
+            font-weight: 300;
+            text-align: center;
+            color: #fff;
+            }
+            #cardva h3 .small {
+            font-size: 56px;
+            font-weight: 100;
+            }
+
+      </style>
+    </head>
+
+    <body style="margin: 0; font-family: Arial, sans-serif;">
+
+      <!-- Background Div -->
+      <div style="
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url(https://i.pinimg.com/736x/83/b4/59/83b459849fac5d53e7345c469b97b270.jpg); /* Replace with your image path */
+          background-size: cover;
+          background-repeat: no-repeat;
+          background-position: center;
+          opacity: 0.5;
+          z-index: -1;
+      "></div>
+    <div id="background"></div>
+    <!-- <div style="text-align: center;">
+        <h2>
+            <span>Timer:(</span>
+            <span id="spH">H</span>:
+            <span id="spM">M</span>:
+            <span id="spS">S</span>)
+        </h2>-->
+      </div><br><hr>  
+    <table>
+        <tr>
+            <td style="margin-left: 300px; margin-right:50px;">
+                <h2>Warning</h2>
+                <div class="fade"><img src="/static/images/red.png" width="100" height="100"></div><br>
+                <div ><img src="/static/images/steering_wheel_green.png" width="100" height="100" id="steeringwheel"></div>
+            </td>
+            <td style="width: 100%;max-width: 800px;height: 400px;margin-top:0;"> 
+              
+              
+              <h1 style="margin-left:80px">Display Signal</h1>
+              <h2 style="margin-left:80px">Analysis Result</h2>
+              <p style="margin-left:80px">{{ analysis_result }}</p>
+              <div id="chart"></div>
+          
+              <div class="button-container">
+                  <button onclick="startDevice()">Capture</button>
+              </div>
+          
+              <div class="flash-message">
+                  {% if flash_message %}
+                      <p>{{ flash_message }}</p>
+                  {% endif %}
+              </div>
+            </td>
+            <td style="margin-top:0%; text-align: center;">
+              <div class="table">
+                <div class="table-cell">
+                  <div id="main">
+                    <div id="screen">
+                      <div id="home">
+                        <div id="radial">
+                          <div id="empty"></div>
+                        </div>
+            
+                        
+                        <h1 id="countdown" style='text-align:center'>0</h1>
+                        <div id="mph">mph</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div> 
+            </td>
+        </tr>
+    </table>
+      
+      
+   </body>
+
+
+   <script>
 
 
     // WebSocket logic
@@ -175,6 +663,65 @@ body {
     .catch(err => console.error("Error starting device:", err));
     }
     </script>
-</body>
-</html>
 
+
+<script type="text/javascript">
+  
+  var speedoMeter1 = new speedometer();
+  document.getElementById('speedometer-1').append(speedoMeter1.elm);
+
+  var speedoMeterInputRange = document.getElementById('speedoMeterInputRange-1');
+  var speedoMeterInputRangeVal = document.getElementById('speedoMeterInputRange-value-1');
+
+  speedoMeterInputRange.onchange = function(e){
+    speedoMeter1.setPosition(e.target.value);
+    speedoMeterInputRangeVal.innerText = e.target.value;
+  }
+  
+  defaultConfig.onclick = function(e){
+    speedoMeter1 = new speedometer({initVal:speedoMeterInputRange.value});
+    document.getElementById('speedometer-1').innerHTML = '';
+    document.getElementById('speedometer-1').append(speedoMeter1.elm);
+  }
+
+  applyconfig1.onclick = function(e){
+    speedoMeter1 = new speedometer({
+    
+      divFact:5, 
+      initVal:speedoMeterInputRange.value, 
+
+      edgeRadius: 300, 
+      indicatorRadius: 280, 
+      indicatorNumbRadius:220,
+      
+      speedoNobeW: 250,
+      id: 'mani-1'
+
+    });
+    document.getElementById('speedometer-1').innerHTML = '';
+    document.getElementById('speedometer-1').append(speedoMeter1.elm);
+  }
+
+  applyconfig2.onclick = function(e){
+    speedoMeter1 = new speedometer({
+      divFact:20, 
+      maxVal: 240,
+
+      initVal:speedoMeterInputRange.value,
+
+      dangerColor: 'green',
+      bgColor: '#aaa',
+      
+      speedArrowColor: 'red',
+      nobNumbColor: 'yellow',
+
+      speedValBGColor: '#666',
+      speedValTxtColor: 'blue'
+    });
+    document.getElementById('speedometer-1').innerHTML = '';
+    document.getElementById('speedometer-1').append(speedoMeter1.elm);
+  
+  }
+  
+</script>
+</html>

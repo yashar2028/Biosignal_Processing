@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Signals</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.flash-message {
+    margin-top: 20px;
+    color: #fff;
+    text-align: center;
+}
+
+.button-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.button-container button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#chart {
+    width: 100%;
+    max-width: 800px;
+    height: 400px;
+    margin: 20px 0;
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(128, 128, 128, 0.6);
+    padding: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <h1>Display Signal</h1>
+    <h2>Analysis Result</h2>
+    <p>{{ analysis_result }}</p>
+    <div id="chart"></div>
+
+    <div class="button-container">
+        <button onclick="startDevice()">Capture</button>
+    </div>
+
+    <div class="flash-message">
+        {% if flash_message %}
+            <p>{{ flash_message }}</p>
+        {% endif %}
+    </div>
+
+    <div id="status-message"></div>
+    
+    <script>
+
+
+    // WebSocket logic
+    const statusMessageElement = document.getElementById("status-message");
+    const websocket = new WebSocket("ws://localhost:8000/ws");
+
+    websocket.onmessage = function(event) {
+        statusMessageElement.textContent = event.data;
+    };
+
+    websocket.onerror = function() {
+        statusMessageElement.textContent = "Error connecting to the server.";
+        statusMessageElement.style.color = "red";
+    };
+
+
+    // Fetch the signal data passed from the backend
+    const signalData = {{ signal_data|tojson }};
+
+    const svg = d3.select("#chart")
+        .append("svg")
+        .attr("width", 800)
+        .attr("height", 400);
+
+    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const width = +svg.attr("width") - margin.left - margin.right;
+    const height = +svg.attr("height") - margin.top - margin.bottom;
+
+    const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    if (signalData.length === 0) {
+        // Handle empty data: display a message
+        svg.append("text")
+            .attr("x", 400) // Center the text horizontally
+            .attr("y", 200) // Center the text vertically
+            .attr("text-anchor", "middle")
+            .text("No data available")
+            .style("fill", "gray")
+            .style("font-size", "20px");
+    } else {
+        // Parse timestamps and values
+        const parsedData = signalData.map(d => ({
+            timestamp: new Date(d.timestamp),
+            first_channel: d.first_channel,
+            second_channel: d.second_channel,
+        }));
+
+        // Set up scales
+        const x = d3.scaleTime()
+            .domain(d3.extent(parsedData, d => d.timestamp))
+            .range([0, width]);
+
+        const y = d3.scaleLinear()
+            .domain([d3.min(parsedData, d => Math.min(d.first_channel, d.second_channel)),
+                     d3.max(parsedData, d => Math.max(d.first_channel, d.second_channel))])
+            .nice()
+            .range([height, 0]);
+
+        // Add axes
+        g.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .call(d3.axisLeft(y));
+
+        // Add lines for each channel
+        const line1 = d3.line()
+            .x(d => x(d.timestamp))
+            .y(d => y(d.first_channel));
+
+        const line2 = d3.line()
+            .x(d => x(d.timestamp))
+            .y(d => y(d.second_channel));
+
+        g.append("path")
+            .datum(parsedData)
+            .attr("fill", "none")
+            .attr("stroke", "blue")
+            .attr("stroke-width", 1.5)
+            .attr("d", line1);
+
+        g.append("path")
+            .datum(parsedData)
+            .attr("fill", "none")
+            .attr("stroke", "red")
+            .attr("stroke-width", 1.5)
+            .attr("d", line2);
+    }
+
+    function startDevice() { // This handles the button.
+        fetch("/start-device", { method: "POST" })
+    .then(response => {
+        if (response.ok && response.redirected) {
+            window.location.href = response.url;
+        } else {
+            console.error("Failed to start device:", response.statusText);
+        }
+    })
+    .catch(err => console.error("Error starting device:", err));
+    }
+    </script>
+</body>
+</html>
+
