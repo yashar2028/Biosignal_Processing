@@ -68,8 +68,26 @@ body {
             <p>{{ flash_message }}</p>
         {% endif %}
     </div>
+
+    <div id="status-message"></div>
     
     <script>
+
+
+    // WebSocket logic
+    const statusMessageElement = document.getElementById("status-message");
+    const websocket = new WebSocket("ws://localhost:8000/ws");
+
+    websocket.onmessage = function(event) {
+        statusMessageElement.textContent = event.data;
+    };
+
+    websocket.onerror = function() {
+        statusMessageElement.textContent = "Error connecting to the server.";
+        statusMessageElement.style.color = "red";
+    };
+
+
     // Fetch the signal data passed from the backend
     const signalData = {{ signal_data|tojson }};
 

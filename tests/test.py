@@ -3,7 +3,9 @@ import asyncio
 from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timezone
-from app.main import app, SignalAmplitude, get_db
+from app.main import app
+from app.dependencies import get_db
+from app.models import SignalAmplitude
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
