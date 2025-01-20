@@ -33,7 +33,9 @@ async def verify_otp(
     request: Request,
     otp_data: VerifyOTP = Depends(VerifyOTP.form),
 ):
-
+    print("Content-Type:", request.headers.get("Content-Type"))
+    print("Body:", await request.body())
+    print("Form Data:", otp_data.dict())
     if (
         request.headers.get("Content-Type")
         == "application/x-www-form-urlencoded"
