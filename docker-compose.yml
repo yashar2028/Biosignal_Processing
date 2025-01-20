@@ -20,6 +20,8 @@ services:
     volumes:
       - /var/run/dbus:/var/run/dbus  # Mount DBus socket for Bluetooth
       - /dev:/dev  # Mount the entire /dev directory (including Bluetooth devices)
+      - ./csv_output:/app/csv_output  # Mount the csv_output folder to the app container
+
     devices:
       - /dev/rfcomm0:/dev/rfcomm0  # Expose the Bluetooth device to the container
 
@@ -34,6 +36,7 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data  # Persist DB data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d  # Mount SQL dump to the initialization directory
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s

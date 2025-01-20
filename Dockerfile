@@ -33,6 +33,9 @@ RUN poetry install --no-root
 # Copy the application code
 COPY app/ /app/app/
 
+# Copy the CSV files for analysis
+COPY csv_output/ /app/csv_output/
+
 # Expose the port FastAPI will run on
 EXPOSE 8000
 
